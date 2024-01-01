@@ -4,15 +4,14 @@ class Node {
 public:
     int data;
     Node* next;
+
 };
 
 class Link {
 public:
-    Node* head;
+    Node* head; // 리스트의 헤드(첫 번째 노드)를 가리키는 포인터
 
-    Link() {
-        head = nullptr;
-    }
+    Link() : head(nullptr) {} // Link 클래스의 생성자 정의, 시작할 때 아무 노드도 가리키지 않는 상태로 설정
 
     void insert(int data);
     int getData(int nodeIndex);
