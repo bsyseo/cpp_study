@@ -63,7 +63,7 @@ int Link::getData(int nodeIndex) {
     }
 
     // 인덱스가 범위를 벗어날 경우 -1 반환
-    return -1;
+    return -1; //예외처리 해주는게 좋을거 같음(try, catch)
 }
 
 // 리스트 출력 메서드 구현
