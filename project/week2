@@ -1,0 +1,159 @@
+#include <iostream>
+#include <memory>
+
+using namespace std;
+
+// 이진 트리의 노드를 나타내는 클래스 정의
+class Node {
+public:
+    int data;                 // 현재 노드의 데이터
+    shared_ptr<Node> left;    // 왼쪽 자식 노드
+    shared_ptr<Node> right;   // 오른쪽 자식 노드
+
+    // 생성자: 초기값을 받아 데이터 멤버를 초기화
+    Node(int initData) : data(initData), left(nullptr), right(nullptr) {}
+};
+
+// 노드를 초기화하고 반환하는 함수
+shared_ptr<Node> Init(shared_ptr<Node> leftN, shared_ptr<Node> rightN, int inData) {
+    return make_shared<Node>(inData);
+}
+
+// 이진 트리에 새로운 값을 삽입하는 함수
+shared_ptr<Node> Insert(shared_ptr<Node> root, int value) {
+    // 트리가 비어있으면 새로운 노드를 만들어 반환
+    if (root == nullptr) {
+        return make_shared<Node>(value);
+    }
+
+    // 삽입할 값이 현재 노드의 데이터보다 작으면 왼쪽으로 이동
+    if (value < root->data) {
+        root->left = Insert(root->left, value);
+    }
+    // 삽입할 값이 현재 노드의 데이터보다 크면 오른쪽으로 이동
+    else if (value > root->data) {
+        root->right = Insert(root->right, value);
+    }
+
+    return root;
+}
+
+// 트리에서 최솟값을 찾아 반환하는 함수
+shared_ptr<Node> FindMin(shared_ptr<Node> root) {
+    while (root->left != nullptr) {
+        root = root->left;
+    }
+    return root;
+}
+
+// 트리에서 값을 삭제하는 함수
+shared_ptr<Node> Delete(shared_ptr<Node> root, int value) {
+    // 트리가 비어있으면 그대로 반환
+    if (root == nullptr) {
+        return root;
+    }
+
+    // 삭제할 값이 현재 노드의 데이터보다 작으면 왼쪽으로 이동
+    if (value < root->data) {
+        root->left = Delete(root->left, value);
+    }
+    // 삭제할 값이 현재 노드의 데이터보다 크면 오른쪽으로 이동
+    else if (value > root->data) {
+        root->right = Delete(root->right, value);
+    }
+    // 삭제할 값이 현재 노드와 같으면
+    else {
+        // 왼쪽 또는 오른쪽 자식이 없는 경우 해당 자식을 반환
+        if (root->left == nullptr) {
+            return root->right;
+        }
+        else if (root->right == nullptr) {
+            return root->left;
+        }
+
+        // 왼쪽 서브트리에서 가장 작은 값을 찾아 현재 노드에 대입하고
+        // 해당 값을 갖는 노드를 삭제
+        root->data = FindMin(root->right)->data;
+        root->right = Delete(root->right, root->data);
+    }
+
+    return root;
+}
+
+// 특정 값을 검색하여 해당 노드를 반환하는 함수
+shared_ptr<Node> Search(shared_ptr<Node> root, int value) {
+    // 트리가 비어있거나 현재 노드의 데이터가 찾는 값과 같으면 현재 노드 반환
+    if (root == nullptr || root->data == value) {
+        return root;
+    }
+
+    // 찾는 값이 현재 노드의 데이터보다 작으면 왼쪽으로 이동
+    if (value < root->data) {
+        return Search(root->left, value);
+    }
+
+    // 찾는 값이 현재 노드의 데이터보다 크면 오른쪽으로 이동
+    return Search(root->right, value);
+}
+
+// 전위 순회를 수행하는 함수
+void preorder(shared_ptr<Node> n) {
+    // 현재 노드가 비어있으면 종료
+    if (n == nullptr) {
+        return;
+    }
+
+    // 현재 노드의 데이터 출력
+    cout << n->data << " ";
+
+    // 왼쪽 서브트리 순회
+    preorder(n->left);
+
+    // 오른쪽 서브트리 순회
+    preorder(n->right);
+}
+
+// 메인 함수
+int main() {
+    // 루트 노드 초기화
+    shared_ptr<Node> root = nullptr;
+
+    // 값 삽입
+    root = Insert(root, 50);
+    Insert(root, 30);
+    Insert(root, 20);
+    Insert(root, 40);
+    Insert(root, 70);
+    Insert(root, 60);
+    Insert(root, 80);
+
+    // 원본 트리 출력 (전위 순회)
+    cout << "원본 트리 (전위 순회): ";
+    preorder(root);
+    cout << endl;
+
+    // 검색할 값
+    int searchValue = 40;
+    // 검색 수행
+    shared_ptr<Node> foundNode = Search(root, searchValue);
+
+    // 검색 결과 출력
+    if (foundNode != nullptr) {
+        cout << "값 " << searchValue << "은(는) 트리에 있습니다." << endl;
+    }
+    else {
+        cout << "값 " << searchValue << "은(는) 트리에 없습니다." << endl;
+    }
+
+    // 삭제할 값
+    int deleteValue = 30;
+    // 값 삭제 수행
+    root = Delete(root, deleteValue);
+
+    // 값 삭제 후 트리 출력 (전위 순회)
+    cout << "값 " << deleteValue << " 삭제 후 트리 (전위 순회): ";
+    preorder(root);
+    cout << endl;
+
+    return 0;
+}
